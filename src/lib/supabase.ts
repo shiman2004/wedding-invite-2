@@ -23,7 +23,7 @@ const getEnvCredentials = () => {
     (import.meta.env as any).NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
     (import.meta.env as any).NEXT_PUBLIC_SUPABASE_ANON_KEY ||
     '';
-  
+
   const localUrl = localStorage.getItem('supabase_custom_url') || '';
   const localKey = localStorage.getItem('supabase_custom_key') || '';
 
@@ -39,7 +39,7 @@ let currentKey = '';
 
 export const getSupabaseClient = (): SupabaseClient | null => {
   const { url, key } = getEnvCredentials();
-  
+
   if (!url || !key || url.includes('your-project-ref') || key.includes('your-anon-key')) {
     return null;
   }
@@ -66,9 +66,9 @@ export const isSupabaseConfigured = (): boolean => {
 export const getSupabaseStatus = () => {
   const { url, key } = getEnvCredentials();
   const isConfigured = Boolean(
-    url && 
-    key && 
-    !url.includes('your-project-ref') && 
+    url &&
+    key &&
+    !url.includes('your-project-ref') &&
     !key.includes('your-anon-key')
   );
 
@@ -156,7 +156,7 @@ export const submitRsvp = async (data: {
 
 export const fetchRsvps = async (): Promise<{ data: RsvpRecord[]; source: 'supabase' | 'local' }> => {
   const supabase = getSupabaseClient();
-  
+
   if (supabase) {
     try {
       const { data, error } = await supabase
@@ -219,3 +219,49 @@ export const deleteRsvp = async (id: string): Promise<boolean> => {
   return true;
 };
 
+// ==========================================
+// WEDDING CONFIG CLOUD SYNC
+// ==========================================
+
+export const fetchRemoteWeddingConfig = async (): Promise<any | null> => {
+  const supabase = getSupabaseClient();
+  if (!supabase) return null;
+
+  try {
+    const { data, error } = await supabase
+      .from('wedding_config')
+      .select('config')
+      .eq('id', 'current_config')
+      .maybeSingle();
+
+    if (!error && data?.config) {
+      return data.config;
+    }
+  } catch (err) {
+    console.warn('Could not fetch remote config from Supabase:', err);
+  }
+
+  return null;
+};
+
+export const saveRemoteWeddingConfig = async (config: any): Promise<boolean> => {
+  const supabase = getSupabaseClient();
+  if (!supabase) return false;
+
+  try {
+    const { error } = await supabase.from('wedding_config').upsert({
+      id: 'current_config',
+      config: config,
+      updated_at: new Date().toISOString(),
+    });
+
+    if (error) {
+      console.error('Error saving wedding config to Supabase:', error);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error('Network error saving wedding config to Supabase:', err);
+    return false;
+  }
+};
