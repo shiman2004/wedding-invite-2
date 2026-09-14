@@ -216,7 +216,6 @@ body {
 }
 
 @keyframes pulse-seal {
-
   0%,
   100% {
     transform: scale(1);
@@ -226,6 +225,19 @@ body {
   50% {
     transform: scale(1.04);
     filter: drop-shadow(0 14px 28px rgba(134, 103, 57, 0.4));
+  }
+}
+
+@keyframes pulse-seal-center {
+  0%,
+  100% {
+    transform: scale(0.95);
+    opacity: 0.65;
+  }
+
+  50% {
+    transform: scale(1.06);
+    opacity: 1;
   }
 }
 

@@ -110,22 +110,34 @@ export const EnvelopeIntro: React.FC<EnvelopeIntroProps> = ({ onOpen }) => {
           }}
         />
 
-        {/* Gentle gold pulse directly around the wax seal */}
+        {/* Perfectly Centered Wax Seal Glow */}
         {!isPlaying && (
           <div
             style={{
               position: 'absolute',
-              top: '50%',
-              left: '50%',
+              top: '51.8%',
+              left: '49.5%',
               transform: 'translate(-50%, -50%)',
-              width: '110px',
-              height: '110px',
-              borderRadius: '50%',
-              boxShadow: '0 0 35px rgba(184, 134, 11, 0.5)',
-              animation: 'pulse-seal 2s infinite ease-in-out',
+              width: '120px',
+              height: '120px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
               pointerEvents: 'none',
+              zIndex: 15,
             }}
-          />
+          >
+            <div
+              style={{
+                width: '105px',
+                height: '105px',
+                borderRadius: '50%',
+                border: '2px solid rgba(212, 175, 55, 0.5)',
+                boxShadow: '0 0 25px rgba(212, 175, 55, 0.55)',
+                animation: 'pulse-seal-center 2s infinite ease-in-out',
+              }}
+            />
+          </div>
         )}
       </div>
     </div>
