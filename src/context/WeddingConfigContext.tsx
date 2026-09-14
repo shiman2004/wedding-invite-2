@@ -1,5 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { fetchRemoteWeddingConfig, saveRemoteWeddingConfig, isSupabaseConfigured } from '../lib/supabase';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 export interface ThemeColors {
   oud: string;
@@ -186,10 +185,6 @@ const STORAGE_KEY = 'blossom_wedding_config_v4';
 
 interface WeddingConfigContextType {
   config: WeddingConfig;
-  isCloudConnected: boolean;
-  isSyncing: boolean;
-  syncToCloud: () => Promise<boolean>;
-  loadFromCloud: () => Promise<boolean>;
   updateConfig: (newConfig: Partial<WeddingConfig>) => void;
   updateNames: (names: Partial<WeddingConfig['names']>) => void;
   updateDate: (date: Partial<WeddingConfig['date']>) => void;
@@ -222,24 +217,6 @@ export const WeddingConfigProvider: React.FC<{ children: React.ReactNode }> = ({
     return DEFAULT_CONFIG;
   });
 
-  const [isSyncing, setIsSyncing] = useState(false);
-  const isCloudConnected = isSupabaseConfigured();
-
-  // Load from Supabase on initial mount
-  useEffect(() => {
-    let isMounted = true;
-    if (isSupabaseConfigured()) {
-      fetchRemoteWeddingConfig().then((remoteConfig) => {
-        if (isMounted && remoteConfig) {
-          setConfig((prev) => ({ ...prev, ...remoteConfig }));
-        }
-      });
-    }
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
   // Apply CSS Variables in real-time & save locally
   useEffect(() => {
     const root = document.documentElement;
@@ -257,37 +234,6 @@ export const WeddingConfigProvider: React.FC<{ children: React.ReactNode }> = ({
       console.warn('LocalStorage save failed:', e);
     }
   }, [config]);
-
-  const syncToCloud = useCallback(async () => {
-    if (!isSupabaseConfigured()) return false;
-    setIsSyncing(true);
-    try {
-      const success = await saveRemoteWeddingConfig(config);
-      setIsSyncing(false);
-      return success;
-    } catch {
-      setIsSyncing(false);
-      return false;
-    }
-  }, [config]);
-
-  const loadFromCloud = useCallback(async () => {
-    if (!isSupabaseConfigured()) return false;
-    setIsSyncing(true);
-    try {
-      const remoteConfig = await fetchRemoteWeddingConfig();
-      if (remoteConfig) {
-        setConfig((prev) => ({ ...prev, ...remoteConfig }));
-        setIsSyncing(false);
-        return true;
-      }
-      setIsSyncing(false);
-      return false;
-    } catch {
-      setIsSyncing(false);
-      return false;
-    }
-  }, []);
 
   const updateConfig = (newConfig: Partial<WeddingConfig>) => {
     setConfig((prev) => ({ ...prev, ...newConfig }));
@@ -407,10 +353,6 @@ export const WeddingConfigProvider: React.FC<{ children: React.ReactNode }> = ({
     <WeddingConfigContext.Provider
       value={{
         config,
-        isCloudConnected,
-        isSyncing,
-        syncToCloud,
-        loadFromCloud,
         updateConfig,
         updateNames,
         updateDate,

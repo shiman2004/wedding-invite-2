@@ -1,7 +1,8 @@
 -- ==============================================================================
 -- BLOSSOM & OUD WEDDING INVITATION - SUPABASE DATABASE SCHEMA
 -- ==============================================================================
--- Paste and run this script in your Supabase SQL Editor (SQL Editor > New Query)
+-- Only the RSVPs table is needed in Supabase!
+-- (Dates, names, timeline, and media stay in the frontend codebase)
 -- ==============================================================================
 
 -- 1. RSVPs TABLE
@@ -26,44 +27,17 @@ CREATE POLICY "Allow anonymous users to insert RSVPs"
     TO anon, authenticated
     WITH CHECK (true);
 
--- Allow anon and authenticated users to read RSVPs (or restrict to admin key/auth)
+-- Allow public read access to RSVPs
 CREATE POLICY "Allow public read access to RSVPs"
     ON public.rsvps
     FOR SELECT
     TO anon, authenticated
     USING (true);
 
--- Allow deletion of RSVPs
+-- Allow public delete access to RSVPs
 CREATE POLICY "Allow public delete access to RSVPs"
     ON public.rsvps
     FOR DELETE
     TO anon, authenticated
     USING (true);
 
--- 2. WEDDING CONFIGURATION TABLE (Cloud CMS)
-CREATE TABLE IF NOT EXISTS public.wedding_config (
-    id TEXT PRIMARY KEY DEFAULT 'current_config',
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-    config JSONB NOT NULL
-);
-
--- Enable Row Level Security (RLS)
-ALTER TABLE public.wedding_config ENABLE ROW LEVEL SECURITY;
-
--- Allow public read access to wedding config
-CREATE POLICY "Allow public read of wedding config"
-    ON public.wedding_config
-    FOR SELECT
-    TO anon, authenticated
-    USING (true);
-
--- Allow public upsert/update of wedding config
-CREATE POLICY "Allow public update of wedding config"
-    ON public.wedding_config
-    FOR ALL
-    TO anon, authenticated
-    USING (true)
-    WITH CHECK (true);
-
--- Optional: Enable Realtime for RSVPs
-ALTER PUBLICATION supabase_realtime ADD TABLE public.rsvps;

@@ -68,10 +68,6 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigateHome }) => {
 
   const {
     config,
-    isCloudConnected,
-    isSyncing,
-    syncToCloud,
-    loadFromCloud,
     updateNames,
     updateDate,
     updateTimeline,
@@ -164,26 +160,8 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigateHome }) => {
     setTimeout(() => setCloudNotice(null), 3000);
   };
 
-  const handleManualSyncCloud = async () => {
-    const success = await syncToCloud();
-    setCloudNotice({
-      type: success ? 'success' : 'error',
-      text: success ? 'Current invitation settings successfully synced to Supabase Cloud!' : 'Sync failed. Please verify your Supabase connection and tables.',
-    });
-    setTimeout(() => setCloudNotice(null), 3500);
-  };
-
-  const handleManualLoadCloud = async () => {
-    const success = await loadFromCloud();
-    setCloudNotice({
-      type: success ? 'success' : 'error',
-      text: success ? 'Latest configuration loaded from Supabase Cloud!' : 'Could not fetch cloud configuration.',
-    });
-    setTimeout(() => setCloudNotice(null), 3500);
-  };
-
   const copySqlSchema = () => {
-    const sql = `-- Blossom & Oud Wedding Invitation Schema
+    const sql = `-- Blossom & Oud Wedding Invitation - RSVPs Schema
 CREATE TABLE IF NOT EXISTS public.rsvps (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
@@ -199,17 +177,7 @@ ALTER TABLE public.rsvps ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Allow public inserts" ON public.rsvps FOR INSERT TO anon, authenticated WITH CHECK (true);
 CREATE POLICY "Allow public reads" ON public.rsvps FOR SELECT TO anon, authenticated USING (true);
-CREATE POLICY "Allow public deletes" ON public.rsvps FOR DELETE TO anon, authenticated USING (true);
-
-CREATE TABLE IF NOT EXISTS public.wedding_config (
-    id TEXT PRIMARY KEY DEFAULT 'current_config',
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-    config JSONB NOT NULL
-);
-
-ALTER TABLE public.wedding_config ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Allow public read config" ON public.wedding_config FOR SELECT TO anon, authenticated USING (true);
-CREATE POLICY "Allow public write config" ON public.wedding_config FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);`;
+CREATE POLICY "Allow public deletes" ON public.rsvps FOR DELETE TO anon, authenticated USING (true);`;
 
     navigator.clipboard.writeText(sql);
     setCopiedSql(true);
@@ -793,8 +761,10 @@ CREATE POLICY "Allow public write config" ON public.wedding_config FOR ALL TO an
           {activeTab === 'supabase' && (
             <div className="admin-panel-card">
               <div className="panel-card-header">
-                <h3>⚡ Supabase Cloud Integration</h3>
-                <p>Manage your Supabase database connection, cloud configuration sync, and database tables.</p>
+                <h3>⚡ Supabase Database (Guest RSVPs)</h3>
+                <p>
+                  Supabase is configured exclusively for collecting live guest RSVPs. Wedding dates, couple names, timeline, and media stay safely in your frontend code.
+                </p>
               </div>
 
               {/* Status Banner */}
@@ -825,34 +795,25 @@ CREATE POLICY "Allow public write config" ON public.wedding_config FOR ALL TO an
                   </div>
                   <div>
                     <h4 style={{ margin: 0, fontSize: '15px', color: 'var(--color-charcoal)' }}>
-                      {isSupabaseConfigured() ? 'Supabase Connected & Active' : 'Supabase Not Configured (Using Local Storage)'}
+                      {isSupabaseConfigured() ? 'Supabase RSVP Database: Connected' : 'Supabase Not Configured (Using Local Storage)'}
                     </h4>
                     <span style={{ fontSize: '12px', color: '#666' }}>
                       {isSupabaseConfigured()
-                        ? `Project URL: ${supabaseConfig.url}`
-                        : 'RSVPs and settings are currently stored in local browser storage.'}
+                        ? `Connected to: ${supabaseConfig.url}`
+                        : 'RSVPs submitted by guests are temporarily stored in local browser storage.'}
                     </span>
                   </div>
                 </div>
 
                 <div style={{ display: 'flex', gap: '8px' }}>
                   <button
-                    onClick={handleManualSyncCloud}
-                    disabled={isSyncing || !isSupabaseConfigured()}
-                    className="admin-btn-primary"
-                    style={{ padding: '8px 14px', fontSize: '12px', opacity: isSupabaseConfigured() ? 1 : 0.6 }}
-                  >
-                    <Cloud size={14} />
-                    <span>{isSyncing ? 'Syncing...' : 'Push Settings to Cloud'}</span>
-                  </button>
-                  <button
-                    onClick={handleManualLoadCloud}
-                    disabled={isSyncing || !isSupabaseConfigured()}
+                    onClick={loadRsvpsData}
+                    disabled={isLoadingRsvps}
                     className="admin-btn-secondary"
-                    style={{ padding: '8px 14px', fontSize: '12px', opacity: isSupabaseConfigured() ? 1 : 0.6 }}
+                    style={{ padding: '8px 14px', fontSize: '12px' }}
                   >
-                    <RefreshCw size={14} />
-                    <span>Pull from Cloud</span>
+                    <RefreshCw size={14} className={isLoadingRsvps ? 'animate-spin' : ''} />
+                    <span>Test & Refresh</span>
                   </button>
                 </div>
               </div>
