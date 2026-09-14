@@ -34,6 +34,7 @@ export const EnvelopeIntro: React.FC<EnvelopeIntroProps> = ({ onOpen }) => {
     setIsPlaying(true);
 
     if (videoRef.current) {
+      videoRef.current.muted = true;
       videoRef.current.currentTime = 0;
       videoRef.current
         .play()
@@ -41,7 +42,7 @@ export const EnvelopeIntro: React.FC<EnvelopeIntroProps> = ({ onOpen }) => {
           // Playing smoothly
         })
         .catch((err) => {
-          console.warn('Video playback error:', err);
+          console.warn('Video playback error on mobile:', err);
           handleFinish();
         });
     } else {
@@ -73,11 +74,14 @@ export const EnvelopeIntro: React.FC<EnvelopeIntroProps> = ({ onOpen }) => {
   return (
     <div
       className="envelope-overlay"
+      onClick={handlePlayMiddleSeal}
+      onTouchStart={handlePlayMiddleSeal}
       style={{
         opacity: isFadingOut ? 0 : 1,
         transition: 'opacity 1.1s cubic-bezier(0.22, 1, 0.36, 1)',
         pointerEvents: isFadingOut ? 'none' : 'auto',
         willChange: 'opacity',
+        cursor: isPlaying ? 'default' : 'pointer',
       }}
     >
       <div
@@ -94,13 +98,43 @@ export const EnvelopeIntro: React.FC<EnvelopeIntroProps> = ({ onOpen }) => {
           backgroundColor: 'var(--color-parchment)',
         }}
       >
-        
-        {/* The Starting Video (Configurable) */}
+        {/* Skip button in top corner for instant entry */}
+        {!isPlaying && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleFinish();
+            }}
+            style={{
+              position: 'absolute',
+              top: '20px',
+              right: '20px',
+              zIndex: 30,
+              background: 'rgba(255, 255, 255, 0.75)',
+              border: '1px solid rgba(134, 103, 57, 0.3)',
+              color: 'var(--color-oud)',
+              padding: '6px 14px',
+              borderRadius: '20px',
+              fontFamily: 'var(--font-sans)',
+              fontSize: '12px',
+              fontWeight: '600',
+              backdropFilter: 'blur(6px)',
+              cursor: 'pointer',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
+            }}
+          >
+            Open Invitation ✉️
+          </button>
+        )}
+
+        {/* The Starting Video */}
         <video
           key={config.video.startingVidUrl}
           ref={videoRef}
           src={config.video.startingVidUrl}
           playsInline
+          muted
+          autoPlay={false}
           preload="auto"
           onTimeUpdate={handleTimeUpdate}
           onEnded={handleFinish}
@@ -113,42 +147,76 @@ export const EnvelopeIntro: React.FC<EnvelopeIntroProps> = ({ onOpen }) => {
           }}
         />
 
-        {/* Clickable Middle Seal Hotspot */}
+        {/* Interactive Tap Prompt & Wax Seal */}
         {!isPlaying && (
           <div
-            onClick={handlePlayMiddleSeal}
-            onTouchStart={handlePlayMiddleSeal}
-            role="button"
-            aria-label="Click middle seal to play"
             style={{
               position: 'absolute',
               top: '50%',
               left: '50%',
               transform: 'translate(-50%, -50%)',
-              width: '130px',
-              height: '130px',
-              borderRadius: '50%',
-              cursor: 'pointer',
-              zIndex: 10,
               display: 'flex',
-              justifyContent: 'center',
+              flexDirection: 'column',
               alignItems: 'center',
-              backgroundColor: 'transparent',
-              WebkitTapHighlightColor: 'transparent',
+              justifyContent: 'center',
+              gap: '14px',
+              zIndex: 20,
+              pointerEvents: 'none',
+              textAlign: 'center',
             }}
           >
-            {/* Subtle gentle pulse ring to invite the tap on the seal */}
+            {/* Glowing Center Wax Ring */}
             <div
               style={{
-                width: '92px',
-                height: '92px',
+                position: 'relative',
+                width: '100px',
+                height: '100px',
                 borderRadius: '50%',
-                border: '2px solid rgba(255, 255, 255, 0.55)',
-                boxShadow: '0 0 25px rgba(212, 175, 55, 0.45)',
-                animation: 'pulse-seal 2s infinite ease-in-out',
-                pointerEvents: 'none',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
-            />
+            >
+              <div
+                style={{
+                  position: 'absolute',
+                  inset: '-10px',
+                  borderRadius: '50%',
+                  border: '2px solid rgba(212, 175, 55, 0.55)',
+                  boxShadow: '0 0 30px rgba(212, 175, 55, 0.6)',
+                  animation: 'pulse-seal 2s infinite ease-in-out',
+                }}
+              />
+              <span style={{ fontSize: '38px', filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.2))' }}>
+                ✉️
+              </span>
+            </div>
+
+            {/* Tap Prompt Badge */}
+            <div
+              style={{
+                background: 'rgba(255, 255, 255, 0.9)',
+                border: '1px solid rgba(134, 103, 57, 0.35)',
+                padding: '8px 18px',
+                borderRadius: '30px',
+                boxShadow: '0 4px 16px rgba(134, 103, 57, 0.2)',
+                backdropFilter: 'blur(8px)',
+              }}
+            >
+              <p
+                style={{
+                  margin: 0,
+                  fontFamily: 'var(--font-serif)',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  letterSpacing: '0.04em',
+                  color: 'var(--color-oud)',
+                  textTransform: 'uppercase',
+                }}
+              >
+                Tap to Open Invitation
+              </p>
+            </div>
           </div>
         )}
 
@@ -156,3 +224,4 @@ export const EnvelopeIntro: React.FC<EnvelopeIntroProps> = ({ onOpen }) => {
     </div>
   );
 };
+
