@@ -13,7 +13,7 @@ export const EnvelopeIntro: React.FC<EnvelopeIntroProps> = ({ onOpen }) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const hasFinishedRef = useRef(false);
 
-  const handlePlayEnvelope = () => {
+  const handleOpen = () => {
     if (isPlaying || isFadingOut) return;
     setIsPlaying(true);
 
@@ -23,10 +23,10 @@ export const EnvelopeIntro: React.FC<EnvelopeIntroProps> = ({ onOpen }) => {
       videoRef.current
         .play()
         .then(() => {
-          // Playing smoothly
+          // Video playing smoothly
         })
         .catch((err) => {
-          console.warn('Video play catch:', err);
+          console.warn('Video playback error:', err);
           handleFinish();
         });
     } else {
@@ -50,7 +50,7 @@ export const EnvelopeIntro: React.FC<EnvelopeIntroProps> = ({ onOpen }) => {
     onOpen();
     setTimeout(() => {
       setIsRemoved(true);
-    }, 900);
+    }, 850);
   };
 
   if (isRemoved) return null;
@@ -58,14 +58,21 @@ export const EnvelopeIntro: React.FC<EnvelopeIntroProps> = ({ onOpen }) => {
   return (
     <div
       className="envelope-overlay"
-      onClick={handlePlayEnvelope}
-      onTouchStart={handlePlayEnvelope}
+      onClick={handleOpen}
+      onTouchStart={handleOpen}
       style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 9999,
+        backgroundColor: '#f6ebd9',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
         opacity: isFadingOut ? 0 : 1,
-        transition: 'opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1)',
+        transition: 'opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1)',
         pointerEvents: isFadingOut ? 'none' : 'auto',
-        willChange: 'opacity',
         cursor: 'pointer',
+        overflow: 'hidden',
       }}
     >
       <div
@@ -79,28 +86,10 @@ export const EnvelopeIntro: React.FC<EnvelopeIntroProps> = ({ onOpen }) => {
           justifyContent: 'center',
           alignItems: 'center',
           overflow: 'hidden',
-          backgroundColor: '#000000',
+          backgroundColor: '#f6ebd9',
         }}
       >
-        {/* Real Starting Video Poster Image (Guarantees immediate display on all phones) */}
-        {!isPlaying && (
-          <img
-            src="/assets/starting_vid_poster.jpg"
-            alt="Wedding Invitation Envelope"
-            style={{
-              position: 'absolute',
-              inset: 0,
-              width: '100%',
-              height: '100%',
-              objectFit: 'contain',
-              zIndex: 5,
-              display: 'block',
-              backgroundColor: '#000000',
-            }}
-          />
-        )}
-
-        {/* The Starting Envelope Opening Video */}
+        {/* The Clean Starting Video with its real poster image */}
         <video
           key={config.video.startingVidUrl}
           ref={videoRef}
@@ -113,18 +102,15 @@ export const EnvelopeIntro: React.FC<EnvelopeIntroProps> = ({ onOpen }) => {
           onTimeUpdate={handleTimeUpdate}
           onEnded={handleFinish}
           style={{
-            position: 'absolute',
-            inset: 0,
             width: '100%',
             height: '100%',
-            objectFit: 'contain',
+            objectFit: 'cover',
             display: 'block',
-            zIndex: isPlaying ? 10 : 2,
-            backgroundColor: '#000000',
+            backgroundColor: '#f6ebd9',
           }}
         />
 
-        {/* Subtle pulsing glow over the wax seal to invite tap */}
+        {/* Gentle gold pulse directly around the wax seal */}
         {!isPlaying && (
           <div
             style={{
@@ -132,13 +118,12 @@ export const EnvelopeIntro: React.FC<EnvelopeIntroProps> = ({ onOpen }) => {
               top: '50%',
               left: '50%',
               transform: 'translate(-50%, -50%)',
-              width: '100px',
-              height: '100px',
+              width: '110px',
+              height: '110px',
               borderRadius: '50%',
-              boxShadow: '0 0 35px rgba(212, 175, 55, 0.65)',
+              boxShadow: '0 0 35px rgba(184, 134, 11, 0.5)',
               animation: 'pulse-seal 2s infinite ease-in-out',
               pointerEvents: 'none',
-              zIndex: 15,
             }}
           />
         )}
@@ -146,5 +131,3 @@ export const EnvelopeIntro: React.FC<EnvelopeIntroProps> = ({ onOpen }) => {
     </div>
   );
 };
-
-
