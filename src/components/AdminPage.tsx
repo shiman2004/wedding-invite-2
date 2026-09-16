@@ -1405,14 +1405,32 @@ CREATE TABLE IF NOT EXISTS public.wedding_config (
               <h4 className="admin-subheading">Choose Video Preset</h4>
               <div className="admin-form-grid-page">
                 <button
-                  className={`admin-video-card-btn ${config.video.startingVidUrl.includes('starting_vid2') ? 'active' : ''
+                  className={`admin-video-card-btn ${config.video.startingVidUrl.includes('new_starting_vid') ? 'active' : ''
                     }`}
                   onClick={() => {
-                    updateVideo({ startingVidUrl: '/assets/starting_vid2.mp4' });
+                    updateVideo({
+                      startingVidUrl: '/assets/new_starting_vid_1.mp4',
+                      startingPosterUrl: '/assets/new_starting_img.PNG',
+                    });
                     triggerSavedNotice();
                   }}
                 >
-                  <strong>Starting Vid 2 (Default Luxury)</strong>
+                  <strong>✨ New Starting Video 1 (Default)</strong>
+                  <span>/assets/new_starting_vid_1.mp4</span>
+                </button>
+
+                <button
+                  className={`admin-video-card-btn ${config.video.startingVidUrl.includes('starting_vid2') ? 'active' : ''
+                    }`}
+                  onClick={() => {
+                    updateVideo({
+                      startingVidUrl: '/assets/starting_vid2.mp4',
+                      startingPosterUrl: '/assets/starting_vid_poster.jpg',
+                    });
+                    triggerSavedNotice();
+                  }}
+                >
+                  <strong>Starting Vid 2 (Luxury)</strong>
                   <span>/assets/starting_vid2.mp4</span>
                 </button>
 
@@ -1420,7 +1438,10 @@ CREATE TABLE IF NOT EXISTS public.wedding_config (
                   className={`admin-video-card-btn ${config.video.startingVidUrl.includes('starting vid.mp4') ? 'active' : ''
                     }`}
                   onClick={() => {
-                    updateVideo({ startingVidUrl: '/assets/starting vid.mp4' });
+                    updateVideo({
+                      startingVidUrl: '/assets/starting vid.mp4',
+                      startingPosterUrl: '/assets/starting_vid_poster.jpg',
+                    });
                     triggerSavedNotice();
                   }}
                 >
@@ -1431,7 +1452,7 @@ CREATE TABLE IF NOT EXISTS public.wedding_config (
 
               <h4 className="admin-subheading" style={{ marginTop: '24px' }}>Or Custom Video URL / Upload</h4>
               <div className="admin-form-card">
-                <label>Video URL or Asset Path</label>
+                <label>Starting Video URL or Asset Path</label>
                 <input
                   type="text"
                   value={config.video.startingVidUrl}
@@ -1439,7 +1460,20 @@ CREATE TABLE IF NOT EXISTS public.wedding_config (
                     updateVideo({ startingVidUrl: e.target.value });
                     triggerSavedNotice();
                   }}
-                  placeholder="/assets/starting_vid2.mp4"
+                  placeholder="/assets/new_starting_vid_1.mp4"
+                />
+              </div>
+
+              <div className="admin-form-card" style={{ marginTop: '14px' }}>
+                <label>Starting Envelope Cover / Poster Image</label>
+                <input
+                  type="text"
+                  value={config.video.startingPosterUrl || ''}
+                  onChange={(e) => {
+                    updateVideo({ startingPosterUrl: e.target.value });
+                    triggerSavedNotice();
+                  }}
+                  placeholder="/assets/new_starting_img.PNG"
                 />
               </div>
 
@@ -1447,7 +1481,7 @@ CREATE TABLE IF NOT EXISTS public.wedding_config (
                 <label>Upload Video from Computer</label>
                 <input
                   type="file"
-                  accept="video/mp4,video/webm"
+                  accept="video/mp4,video/webm,video/quicktime"
                   ref={fileInputRef}
                   onChange={handleVideoUpload}
                 />
