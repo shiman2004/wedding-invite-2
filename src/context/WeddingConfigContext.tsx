@@ -41,6 +41,7 @@ export interface WeddingConfig {
   };
   video: {
     startingVidUrl: string;
+    startingPosterUrl: string;
     bgVideoUrl: string;
   };
   music: {
@@ -156,7 +157,8 @@ export const DEFAULT_CONFIG: WeddingConfig = {
     ],
   },
   video: {
-    startingVidUrl: '/assets/starting_vid2.mp4',
+    startingVidUrl: '/assets/new_starting_vid_1.mp4',
+    startingPosterUrl: '/assets/new_starting_img.PNG',
     bgVideoUrl: '/assets/luxury_bg.mp4',
   },
   music: {
@@ -214,7 +216,24 @@ export const WeddingConfigProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
-        return { ...DEFAULT_CONFIG, ...JSON.parse(saved) };
+        const parsed = JSON.parse(saved);
+        if (
+          parsed.video &&
+          (!parsed.video.startingVidUrl ||
+            parsed.video.startingVidUrl === '/assets/starting_vid2.mp4' ||
+            parsed.video.startingVidUrl === '/assets/new_starting_vid.mp4')
+        ) {
+          parsed.video.startingVidUrl = '/assets/new_starting_vid_1.mp4';
+        }
+        return {
+          ...DEFAULT_CONFIG,
+          ...parsed,
+          video: {
+            ...DEFAULT_CONFIG.video,
+            ...(parsed.video || {}),
+            startingPosterUrl: parsed.video?.startingPosterUrl || DEFAULT_CONFIG.video.startingPosterUrl,
+          },
+        };
       }
     } catch {
       // ignore

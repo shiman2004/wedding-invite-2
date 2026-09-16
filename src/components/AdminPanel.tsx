@@ -535,14 +535,32 @@ export const AdminPanel: React.FC = () => {
                   <div className="admin-video-presets">
                     <button
                       className={`video-preset-btn ${
-                        config.video.startingVidUrl.includes('starting_vid2') ? 'active' : ''
+                        config.video.startingVidUrl.includes('new_starting_vid') ? 'active' : ''
                       }`}
                       onClick={() => {
-                        updateVideo({ startingVidUrl: '/assets/starting_vid2.mp4' });
+                        updateVideo({
+                          startingVidUrl: '/assets/new_starting_vid_1.mp4',
+                          startingPosterUrl: '/assets/new_starting_img.PNG',
+                        });
                         triggerSavedNotice();
                       }}
                     >
-                      Preset 1: Starting Vid 2 (Default)
+                      ✨ New Starting Video 1 (Default)
+                    </button>
+
+                    <button
+                      className={`video-preset-btn ${
+                        config.video.startingVidUrl.includes('starting_vid2') ? 'active' : ''
+                      }`}
+                      onClick={() => {
+                        updateVideo({
+                          startingVidUrl: '/assets/starting_vid2.mp4',
+                          startingPosterUrl: '/assets/starting_vid_poster.jpg',
+                        });
+                        triggerSavedNotice();
+                      }}
+                    >
+                      Starting Vid 2
                     </button>
 
                     <button
@@ -550,16 +568,19 @@ export const AdminPanel: React.FC = () => {
                         config.video.startingVidUrl.includes('starting vid.mp4') ? 'active' : ''
                       }`}
                       onClick={() => {
-                        updateVideo({ startingVidUrl: '/assets/starting vid.mp4' });
+                        updateVideo({
+                          startingVidUrl: '/assets/starting vid.mp4',
+                          startingPosterUrl: '/assets/starting_vid_poster.jpg',
+                        });
                         triggerSavedNotice();
                       }}
                     >
-                      Preset 2: Starting Vid 1 (Alternative)
+                      Starting Vid 1
                     </button>
                   </div>
 
                   <div className="admin-form-group" style={{ marginTop: '16px' }}>
-                    <label>Or Enter Custom Video URL / Asset Path</label>
+                    <label>Starting Envelope Video URL / Asset Path</label>
                     <input
                       type="text"
                       value={config.video.startingVidUrl}
@@ -567,7 +588,20 @@ export const AdminPanel: React.FC = () => {
                         updateVideo({ startingVidUrl: e.target.value });
                         triggerSavedNotice();
                       }}
-                      placeholder="/assets/my_video.mp4"
+                      placeholder="/assets/new_starting_vid_1.mp4"
+                    />
+                  </div>
+
+                  <div className="admin-form-group">
+                    <label>Starting Envelope Cover / Poster Image</label>
+                    <input
+                      type="text"
+                      value={config.video.startingPosterUrl || ''}
+                      onChange={(e) => {
+                        updateVideo({ startingPosterUrl: e.target.value });
+                        triggerSavedNotice();
+                      }}
+                      placeholder="/assets/new_starting_img.PNG"
                     />
                   </div>
 
@@ -575,7 +609,7 @@ export const AdminPanel: React.FC = () => {
                     <label>Or Upload Video File From Computer</label>
                     <input
                       type="file"
-                      accept="video/mp4,video/webm"
+                      accept="video/mp4,video/webm,video/quicktime"
                       ref={fileInputRef}
                       onChange={handleVideoUpload}
                       style={{ marginTop: '4px' }}

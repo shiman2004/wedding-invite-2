@@ -94,7 +94,7 @@ export const EnvelopeIntro: React.FC<EnvelopeIntroProps> = ({ onOpen }) => {
           key={config.video.startingVidUrl}
           ref={videoRef}
           src={config.video.startingVidUrl}
-          poster="/assets/starting_vid_poster.jpg"
+          poster={config.video.startingPosterUrl || '/assets/new_starting_img.PNG'}
           playsInline
           muted
           autoPlay={false}
